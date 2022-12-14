@@ -1,14 +1,13 @@
 require 'json'
 
 class Game
-  attr_accessor :word, :correct_array, :guesses_left, :letters_correct
+  attr_accessor :secret_word, :correct_array, :guesses_left, :letters_correct
 
   def initialize
   @@guesses_left = 15
   @@letters_correct = Array.new
-    new_word
-    @@correct_array = Array.new(@@word.length.to_i) {" _ "}
-    # puts self.word
+    get_word
+    @@correct_array = Array.new(@@secret_word.length.to_i) {" _ "}
     puts "\nWelcome to Hangman! You can guess a letter by typing it into the console.
     You can save at any time by entering SAVE or load a previous save by entering LOAD.\n\n"
     display
@@ -23,7 +22,7 @@ class Game
   
 
   def self.save_game
-    json = JSON.generate({guesses_left: @@guesses_left, letters_correct: @@letters_correct, correct_array: @@correct_array, word: @@word})
+    json = JSON.generate({guesses_left: @@guesses_left, correct_array: @@correct_array, secret_word: @@secret_word})
     Dir.mkdir('saves') unless Dir.exist?('saves')
     filename = "saves/save.json"
     File.open(filename, 'w') do |file|
@@ -36,12 +35,11 @@ class Game
     string = File.read(filename)
     data = JSON.parse(string)
     @@guesses_left = data["guesses_left"]
-    @@letters_correct = data["letters_correct"]
     @@correct_array = data["correct_array"]
-    @@word = data["word"]
+    @@secret_word = data["secret_word"]
   end
 
-  def new_word
+  def get_word
     contents = File.readlines('google_10000_english_no_swear.txt')
     words = Array.new()
 
@@ -50,11 +48,11 @@ class Game
       word.length > 5 && word.length < 12 ? words.push(word.chomp.upcase) : next
     end
 
-    @@word = words.sample.split('')
+    @@secret_word = words.sample.split('')
   end
    
   def check_guess
-    @@word.each_with_index do
+    @@secret_word.each_with_index do
       |letter, index| 
       if letter == Player.user_input
       @@letters_correct.push(index)
@@ -62,8 +60,8 @@ class Game
         next 
       end
     end
-  @@letters_correct == [] ?@@guesses_left =@@guesses_left - 1 : false
-    return@@letters_correct
+  @@letters_correct == [] ? @@guesses_left = @@guesses_left - 1 : false
+    return @@letters_correct
   end
 
   def display
@@ -76,12 +74,12 @@ class Game
   end
 
   def is_win?
-    if (@@correct_array.map{ |el| el.strip }) == @@word
+    if (@@correct_array.map{ |el| el.strip }) == @@secret_word
       puts "You win!"
       return true
     elsif@@guesses_left == 0
       puts "You lose!"
-      puts "\n The word was: #{self.word.join("")}"
+      puts "\n The word was: #{@@secret_word.join("")}"
       return true
     end
   end
