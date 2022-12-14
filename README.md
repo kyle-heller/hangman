@@ -8,7 +8,7 @@ Build a command-line version of the Hangman game where the computer will randoml
 
 ## What I used
 
-Mixins, JSON, serialization
+JSON, serialization
 
 ## What I learned
 
