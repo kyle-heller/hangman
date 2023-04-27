@@ -65,7 +65,7 @@ class Game
 
   def show_already_guessed
     if @guessed.count % 5 == 0
-      puts "\nAlready guessed: #{guessed.sort.join(", ")}\n".gray
+      puts "\nAlready guessed: #{guessed.sort.join(", ")}\n".brown
     end
   end
 
